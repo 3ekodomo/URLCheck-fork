@@ -102,6 +102,7 @@ public class ModulesActivity extends Activity {
         // inflate
         View parent = Inflater.inflate(R.layout.config_module, list);
         parent.setTag(module.getId());
+        AndroidUtils.setCustomBackground(parent, this);
         Animations.enableAnimationsRecursively(parent); // instead of full activity to avoid 'replacing' when reordering
 
         // configure enable toggle

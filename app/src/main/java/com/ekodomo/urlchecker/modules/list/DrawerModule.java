@@ -70,6 +70,7 @@ class DrawerDialog extends AModuleDialog {
         buttonL = views.findViewById(R.id.drawerL);
         buttonR = views.findViewById(R.id.drawerR);
         var parent = views.findViewById(R.id.parent);
+        com.ekodomo.urlchecker.utilities.methods.AndroidUtils.setCustomBackground(parent, getActivity());
         parent.getBackground().setAlpha(25);
 
         parent.setOnClickListener(v -> setDrawerVisibility(!getActivity().isDrawerVisible()));

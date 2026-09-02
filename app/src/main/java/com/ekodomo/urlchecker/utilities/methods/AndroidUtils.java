@@ -6,7 +6,9 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.text.SpannableStringBuilder;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 
 import com.ekodomo.urlchecker.BuildConfig;
 import com.ekodomo.urlchecker.R;
+import com.ekodomo.urlchecker.utilities.AndroidSettings;
 import com.ekodomo.urlchecker.utilities.methods.JavaUtils.Consumer;
 
 import java.io.File;
@@ -70,6 +73,50 @@ public interface AndroidUtils {
     static void setRawRoundedColor(int color, View view) {
         var drawable = view.getContext().getResources().getDrawable(R.drawable.round_box);
         drawable.setColorFilter(color, PorterDuff.Mode.SRC);
+        view.setBackground(drawable);
+    }
+
+    /**
+     * Applies custom background style to a view based on user preferences.
+     * Replaces uses of predefined drawables like round_border and round_box
+     * with a dynamically generated GradientDrawable.
+     */
+    static void setCustomBackground(View view, Context context) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+
+        // Element Color
+        try {
+            String colorStr = AndroidSettings.ELEMENT_COLOR_PREF(context).get();
+            int color = Color.parseColor(colorStr);
+            drawable.setColor(color);
+        } catch (IllegalArgumentException e) {
+            drawable.setColor(Color.WHITE); // Default if parse fails
+        }
+
+        // Edges Configuration
+        boolean isRounded = AndroidSettings.EDGES_PREF(context).get() == AndroidSettings.Edges.ROUNDED;
+        if (isRounded) {
+            float amount = (float) AndroidSettings.ROUNDED_AMOUNT_PREF(context).get();
+            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
+            drawable.setCornerRadius(radius);
+        } else {
+            drawable.setCornerRadius(0f);
+        }
+
+        // Border Configuration
+        if (AndroidSettings.SHOW_BORDER_PREF(context).get()) {
+            try {
+                String colorStr = AndroidSettings.BORDER_COLOR_PREF(context).get();
+                int color = Color.parseColor(colorStr);
+                // ~1.5dp stroke width as default, 4px was used before in round_border
+                int strokeWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, context.getResources().getDisplayMetrics());
+                drawable.setStroke(strokeWidth, color);
+            } catch (IllegalArgumentException e) {
+                // Ignore stroke color issue
+            }
+        }
+
         view.setBackground(drawable);
     }
 
