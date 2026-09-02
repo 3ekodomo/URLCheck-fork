@@ -104,7 +104,7 @@ public interface AndroidUtils {
             drawable.setCornerRadius(0f);
         } else {
             // DEFAULT
-            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.getResources().getDisplayMetrics());
+            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20f, context.getResources().getDisplayMetrics());
             drawable.setCornerRadius(radius);
         }
 
@@ -143,9 +143,12 @@ public interface AndroidUtils {
             float amount = (float) AndroidSettings.ROUNDED_AMOUNT_PREF(context).get();
             float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
             drawable.setCornerRadius(radius);
-        } else {
-            // Both SHARP and DEFAULT are 0dp for the outer border
+        } else if (edgePref == AndroidSettings.Edges.SHARP) {
             drawable.setCornerRadius(0f);
+        } else {
+            // DEFAULT
+            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20f, context.getResources().getDisplayMetrics());
+            drawable.setCornerRadius(radius);
         }
 
         // Border Configuration

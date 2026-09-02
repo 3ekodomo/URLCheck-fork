@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.content.SharedPreferences;
 import android.widget.Spinner;
 
 import com.ekodomo.urlchecker.R;
@@ -28,6 +29,12 @@ import java.util.Objects;
 
 /** An activity with general app-related settings */
 public class SettingsActivity extends Activity {
+
+    private final SharedPreferences.OnSharedPreferenceChangeListener themeChangeListener = (sharedPreferences, key) -> {
+        if ("dayNight".equals(key)) {
+            recreate();
+        }
+    };
 
     /** The width pref */
     public static IntPref WIDTH_PREF(Context cntx) {
@@ -66,6 +73,18 @@ public class SettingsActivity extends Activity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        com.ekodomo.urlchecker.utilities.generics.GenericPref.getPrefs(this).registerOnSharedPreferenceChangeListener(themeChangeListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        com.ekodomo.urlchecker.utilities.generics.GenericPref.getPrefs(this).unregisterOnSharedPreferenceChangeListener(themeChangeListener);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             // press the 'back' button in the action bar to go back
@@ -97,7 +116,7 @@ public class SettingsActivity extends Activity {
         // init dayNight spinner
         AndroidSettings.THEME_PREF(this).attachToSpinner(
                 this.findViewById(R.id.theme),
-                v -> AndroidSettings.reload(SettingsActivity.this)
+                null
         );
 
         // init width seekBar
