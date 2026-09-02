@@ -1,0 +1,154 @@
+So Enum uses `getId()` for saving!
+I will make:
+```java
+enum Edges implements Enums.IdEnum, Enums.StringEnum {
+    ROUNDED(0, R.string.spin_edges_rounded),
+    SHARP(1, R.string.spin_edges_sharp),
+    DEFAULT(2, R.string.spin_edges_default),
+    ;
+```
+to keep compatibility for ROUNDED and SHARP.
+
+Then update `AndroidUtils.java`:
+```java
+    static void setCustomBackground(View view, Context context) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+
+        // Element Color
+        try {
+            String colorStr = AndroidSettings.ELEMENT_COLOR_PREF(context).get();
+            int color = Color.parseColor(colorStr);
+            drawable.setColor(color);
+        } catch (IllegalArgumentException e) {
+            drawable.setColor(Color.WHITE); // Default if parse fails
+        }
+
+        // Edges Configuration
+        AndroidSettings.Edges edgePref = AndroidSettings.EDGES_PREF(context).get();
+        if (edgePref == AndroidSettings.Edges.ROUNDED) {
+            float amount = (float) AndroidSettings.ROUNDED_AMOUNT_PREF(context).get();
+            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
+            drawable.setCornerRadius(radius);
+        } else if (edgePref == AndroidSettings.Edges.SHARP) {
+            drawable.setCornerRadius(0f);
+        } else {
+            // DEFAULT
+            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.getResources().getDisplayMetrics());
+            drawable.setCornerRadius(radius);
+        }
+
+        // Border Configuration
+        if (AndroidSettings.SHOW_ELEMENT_BORDER_PREF(context).get()) {
+            try {
+                String colorStr = AndroidSettings.BORDER_COLOR_PREF(context).get();
+                int color = Color.parseColor(colorStr);
+                int strokeWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, context.getResources().getDisplayMetrics());
+                drawable.setStroke(strokeWidth, color);
+            } catch (IllegalArgumentException e) {
+                // Ignore stroke color issue
+            }
+        }
+
+        view.setBackground(drawable);
+    }
+
+    static void setInterfaceBorder(View view, Context context) {
+        if (!AndroidSettings.SHOW_INTERFACE_BORDER_PREF(context).get()) {
+            // Do not clear the background completely, maybe there's none, but we can set it to null or not do anything.
+            // Wait, we shouldn't wipe out the original background. The default interface border is OFF.
+            // If it's OFF, we can set background to null? Actually `ll_main` and `middle_modules` have no background initially.
+            view.setBackground(null);
+            return;
+        }
+
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+        drawable.setColor(Color.TRANSPARENT);
+
+        // Edges Configuration
+        AndroidSettings.Edges edgePref = AndroidSettings.EDGES_PREF(context).get();
+        if (edgePref == AndroidSettings.Edges.ROUNDED) {
+            float amount = (float) AndroidSettings.ROUNDED_AMOUNT_PREF(context).get();
+            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
+            drawable.setCornerRadius(radius);
+        } else if (edgePref == AndroidSettings.Edges.SHARP) {
+            drawable.setCornerRadius(0f);
+        } else {
+            // DEFAULT
+            drawable.setCornerRadius(0f); // Default interface has 0dp radius for the outer border
+        }
+
+        try {
+            String colorStr = AndroidSettings.BORDER_COLOR_PREF(context).get();
+            int color = Color.parseColor(colorStr);
+            int strokeWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, context.getResources().getDisplayMetrics());
+            drawable.setStroke(strokeWidth, color);
+        } catch (IllegalArgumentException e) {
+            // Ignore stroke color issue
+        }
+
+        view.setBackground(drawable);
+    }
+```
+And apply `AndroidUtils.setInterfaceBorder(findViewById(R.id.middle_modules), this);` in `MainDialog.java`.
+
+Is `middle_modules` the right view for the outer interface border?
+```xml
+    <LinearLayout
+        android:id="@+id/middle_modules"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <requestFocus .../>
+
+        <LinearLayout
+            android:id="@+id/main" .../>
+
+        <LinearLayout
+            android:id="@+id/drawer" .../>
+    </LinearLayout>
+```
+If we set the background on `middle_modules`, it will surround both `main` and `drawer`, which perfectly matches "surround all relevant URLCheck controls as one unified panel".
+Let's double check if we need to add padding to `middle_modules`. Currently `middle_modules` doesn't have padding, but its parent `ScrollView` has padding:
+```xml
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp" ...>
+```
+So adding a border around `middle_modules` will look like a neat continuous border!
+
+Wait, `SHOW_INTERFACE_BORDER_PREF` default should be `false`.
+`SHOW_ELEMENT_BORDER_PREF` default should be `false`.
+`EDGES_PREF` default should be `DEFAULT`.
+
+In `SettingsActivity.java`, replace `SHOW_BORDER_PREF` references with both `SHOW_INTERFACE_BORDER_PREF` and `SHOW_ELEMENT_BORDER_PREF`.
+`activity_settings.xml`:
+```xml
+        <Switch
+            android:id="@+id/show_element_borders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/smallPadding"
+            android:text="@string/txt_show_element_borders" />
+
+        <Switch
+            android:id="@+id/show_interface_border"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/smallPadding"
+            android:text="@string/txt_show_interface_border" />
+```
+And add them in `SettingsActivity.java`.
+
+Wait! The `ELEMENT_COLOR_PREF` was using `#ffffff`. If it's the original default, it's fine.
+Is `#ffffff` the exact original color? `round_box.xml` had `<solid android:color="#ffffff" />`. So it is correct.
+And `#808080`? In `colors.xml`, `<color name="grey">#808080</color>`. And `round_border.xml` had stroke with color `@color/grey`.
+So it is correct.
+
+Let's plan this out!

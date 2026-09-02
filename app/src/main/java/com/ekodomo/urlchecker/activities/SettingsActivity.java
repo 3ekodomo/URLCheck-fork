@@ -135,7 +135,8 @@ public class SettingsActivity extends Activity {
                 seekBarValue -> seekBarValue
         );
 
-        AndroidSettings.SHOW_BORDER_PREF(this).attachToSwitch(findViewById(R.id.show_border));
+        AndroidSettings.SHOW_ELEMENT_BORDER_PREF(this).attachToSwitch(findViewById(R.id.show_element_borders));
+        AndroidSettings.SHOW_INTERFACE_BORDER_PREF(this).attachToSwitch(findViewById(R.id.show_interface_border));
 
         AndroidSettings.ELEMENT_COLOR_PREF(this).attachToEditText(findViewById(R.id.element_color));
         AndroidSettings.BORDER_COLOR_PREF(this).attachToEditText(findViewById(R.id.border_color));

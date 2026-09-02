@@ -95,17 +95,21 @@ public interface AndroidUtils {
         }
 
         // Edges Configuration
-        boolean isRounded = AndroidSettings.EDGES_PREF(context).get() == AndroidSettings.Edges.ROUNDED;
-        if (isRounded) {
+        AndroidSettings.Edges edgePref = AndroidSettings.EDGES_PREF(context).get();
+        if (edgePref == AndroidSettings.Edges.ROUNDED) {
             float amount = (float) AndroidSettings.ROUNDED_AMOUNT_PREF(context).get();
             float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
             drawable.setCornerRadius(radius);
-        } else {
+        } else if (edgePref == AndroidSettings.Edges.SHARP) {
             drawable.setCornerRadius(0f);
+        } else {
+            // DEFAULT
+            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.getResources().getDisplayMetrics());
+            drawable.setCornerRadius(radius);
         }
 
         // Border Configuration
-        if (AndroidSettings.SHOW_BORDER_PREF(context).get()) {
+        if (AndroidSettings.SHOW_ELEMENT_BORDER_PREF(context).get()) {
             try {
                 String colorStr = AndroidSettings.BORDER_COLOR_PREF(context).get();
                 int color = Color.parseColor(colorStr);
@@ -115,6 +119,44 @@ public interface AndroidUtils {
             } catch (IllegalArgumentException e) {
                 // Ignore stroke color issue
             }
+        }
+
+        view.setBackground(drawable);
+    }
+
+    /**
+     * Applies custom background style for the interface border based on user preferences.
+     */
+    static void setInterfaceBorder(View view, Context context) {
+        if (!AndroidSettings.SHOW_INTERFACE_BORDER_PREF(context).get()) {
+            view.setBackground(null);
+            return;
+        }
+
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+        drawable.setColor(Color.TRANSPARENT);
+
+        // Edges Configuration
+        AndroidSettings.Edges edgePref = AndroidSettings.EDGES_PREF(context).get();
+        if (edgePref == AndroidSettings.Edges.ROUNDED) {
+            float amount = (float) AndroidSettings.ROUNDED_AMOUNT_PREF(context).get();
+            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
+            drawable.setCornerRadius(radius);
+        } else {
+            // Both SHARP and DEFAULT are 0dp for the outer border
+            drawable.setCornerRadius(0f);
+        }
+
+        // Border Configuration
+        try {
+            String colorStr = AndroidSettings.BORDER_COLOR_PREF(context).get();
+            int color = Color.parseColor(colorStr);
+            // ~1.5dp stroke width as default
+            int strokeWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, context.getResources().getDisplayMetrics());
+            drawable.setStroke(strokeWidth, color);
+        } catch (IllegalArgumentException e) {
+            // Ignore stroke color issue
         }
 
         view.setBackground(drawable);
