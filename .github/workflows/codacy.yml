@@ -57,6 +57,14 @@ jobs:
           # This will handover control about PR rejection to the GitHub side
           max-allowed-issues: 2147483647
 
+      # Fix for CodeQL action not supporting multiple SARIF runs with the same category
+      - name: Assign unique categories to SARIF runs
+        run: |
+          if [ -f results.sarif ]; then
+            jq '.runs |= [to_entries[] | .value + {automationDetails: ((.value.automationDetails // {}) + {id: ("codacy/" + (((.value.tool.driver.name | tostring) + "-" + (.key | tostring)) | sub(" "; "-"; "g")) )})}]' results.sarif > results_fixed.sarif
+            mv results_fixed.sarif results.sarif
+          fi
+
       # Upload the SARIF file generated in the previous step
       - name: Upload SARIF results file
         uses: github/codeql-action/upload-sarif@v4
