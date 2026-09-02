@@ -140,7 +140,7 @@ public final class DialogCustomization {
                 return value.data;
             }
         }
-        return AndroidSettings.getDefaultElementColor(context);
+        return Color.parseColor(AndroidSettings.getDefaultElementColor(context));
     }
 
     private static int parseColor(String value, String fallback) {
