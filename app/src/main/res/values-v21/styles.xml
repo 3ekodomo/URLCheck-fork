@@ -28,4 +28,22 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textViewStyle">@style/MyTextViewStyle</item>
     </style>
+
+    <style name="ActivityThemeAmoled"
+        parent="android:Theme.DeviceDefault">
+        <item name="colorAccent">?android:attr/colorAccent</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textViewStyle">@style/MyTextViewStyle</item>
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:colorBackground">#000000</item>
+    </style>
+
+    <style name="DialogThemeAmoled"
+        parent="android:Theme.DeviceDefault.Dialog">
+        <item name="colorAccent">?android:attr/colorAccent</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textViewStyle">@style/MyTextViewStyle</item>
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:colorBackground">#000000</item>
+    </style>
 </resources>

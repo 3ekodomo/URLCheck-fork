@@ -55,6 +55,7 @@ Translations: %3$s."</string>
     <string name="txt_theme">Theme:</string>
     <string name="spin_darkTheme">Dark</string>
     <string name="spin_lightTheme">Light</string>
+    <string name="spin_amoledTheme">AMOLED</string>
     <string name="txt_width">Dialog width (0 for automatic):\nWarning! Small values may hide screen elements.</string>
     <string name="spin_fullWidth">Full</string>
     <string name="spin_dynamicWidth">Dynamic</string>
@@ -381,6 +382,11 @@ This module has been deprecated in favor of the 'Uri parts' module"</string>
     <string name="mLog_unlimited">Unlimited</string>
     <!-- -->
     <string name="mHosts_name">Hosts labeler</string>
+    <string name="mBlocker_name">URL Blocker</string>
+    <string name="mBlocker_desc">This module blocks URLs or Hosts based on wildcard rules (* and ?).</string>
+    <string name="mBlocker_rules">Rules (one per line):</string>
+    <string name="mBlocker_blocked">URL Blocked</string>
+
     <string name="mHosts_desc">"This module labels hosts, configured either by specifying them manually or by using a remote hosts-like file. You can use it to warn about dangerous or special sites. The builtin configuration specifies StevenBlack's hosts (adware/malware, fakenews, gambling and adult content) from %s. Note: subdomains will also be checked, so 'x.y.z' and 'y.z' will be detected for the entry 'y.z'"</string>
     <string name="mHosts_tm">StevenBlack\'s hosts from %s</string>
     <string name="mHosts_malware">adware/malware</string>
