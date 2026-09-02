@@ -43,4 +43,4 @@ height="80">](https://github.com/3ekodomo/URLCheck-fork/releases/latest/)
 
 
 # Credits
-- [TrianguloY](https://github.com/TrianguloY/URLCheck)
+- [TrianguloY/URLCheck](https://github.com/TrianguloY/URLCheck)
