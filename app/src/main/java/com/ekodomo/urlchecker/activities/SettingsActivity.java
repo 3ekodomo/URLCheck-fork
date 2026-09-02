@@ -156,6 +156,11 @@ public class SettingsActivity extends Activity {
                 }
         );
 
+        AndroidSettings.INTERFACE_EDGES_PREF(this).attachToSpinner(
+                this.findViewById(R.id.overall_interface_edges),
+                v -> AndroidSettings.reload(SettingsActivity.this)
+        );
+
         AndroidSettings.ROUNDED_AMOUNT_PREF(this).attachToSeekBar(
                 findViewById(R.id.rounded_amount_value),
                 findViewById(R.id.rounded_amount_label),

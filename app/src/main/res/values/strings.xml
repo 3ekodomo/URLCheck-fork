@@ -60,7 +60,8 @@ Translations: %3$s."</string>
     <string name="spin_fullWidth">Full</string>
     <string name="spin_dynamicWidth">Dynamic</string>
     <string name="txt_locale">Locale:</string>
-    <string name="txt_interface_edges">Interface edges:</string>
+    <string name="txt_element_edges">Element edges:</string>
+    <string name="txt_overall_interface_edges">Overall interface edges:</string>
     <string name="spin_edges_rounded">Rounded</string>
     <string name="spin_edges_sharp">Sharp</string>
     <string name="spin_edges_default">Default</string>

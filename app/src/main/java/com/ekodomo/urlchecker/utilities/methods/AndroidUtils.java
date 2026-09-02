@@ -138,17 +138,12 @@ public interface AndroidUtils {
         drawable.setColor(Color.TRANSPARENT);
 
         // Edges Configuration
-        AndroidSettings.Edges edgePref = AndroidSettings.EDGES_PREF(context).get();
-        if (edgePref == AndroidSettings.Edges.ROUNDED) {
-            float amount = (float) AndroidSettings.ROUNDED_AMOUNT_PREF(context).get();
-            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
-            drawable.setCornerRadius(radius);
-        } else if (edgePref == AndroidSettings.Edges.SHARP) {
-            drawable.setCornerRadius(0f);
-        } else {
-            // DEFAULT
+        AndroidSettings.InterfaceEdges interfaceEdgePref = AndroidSettings.INTERFACE_EDGES_PREF(context).get();
+        if (interfaceEdgePref == AndroidSettings.InterfaceEdges.ROUNDED) {
             float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20f, context.getResources().getDisplayMetrics());
             drawable.setCornerRadius(radius);
+        } else {
+            drawable.setCornerRadius(0f);
         }
 
         // Border Configuration

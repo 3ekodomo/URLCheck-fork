@@ -102,6 +102,36 @@ public interface AndroidSettings {
         return new EnumerationPref<>("edges", Edges.DEFAULT, Edges.class, cntx);
     }
 
+    /* ------------------- ui interface edges ------------------- */
+
+    enum InterfaceEdges implements Enums.IdEnum, Enums.StringEnum {
+        ROUNDED(0, R.string.spin_edges_rounded),
+        SHARP(1, R.string.spin_edges_sharp),
+        ;
+
+        private final int id;
+        private final int string;
+
+        InterfaceEdges(int id, int string) {
+            this.id = id;
+            this.string = string;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public int getStringResource() {
+            return string;
+        }
+    }
+
+    static EnumerationPref<InterfaceEdges> INTERFACE_EDGES_PREF(Context cntx) {
+        return new EnumerationPref<>("interfaceEdges", InterfaceEdges.ROUNDED, InterfaceEdges.class, cntx);
+    }
+
     static IntPref ROUNDED_AMOUNT_PREF(Context cntx) {
         return new IntPref("roundedAmount", 20, cntx);
     }

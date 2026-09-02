@@ -133,10 +133,28 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/txt_interface_edges" />
+                android:text="@string/txt_element_edges" />
 
             <Spinner
                 android:id="@+id/edges"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:saveEnabled="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/padding">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/txt_overall_interface_edges" />
+
+            <Spinner
+                android:id="@+id/overall_interface_edges"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:saveEnabled="false" />
@@ -197,7 +215,6 @@
 
             <EditText
                 android:id="@+id/element_color"
-                android:saveEnabled="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"
@@ -219,7 +236,6 @@
 
             <EditText
                 android:id="@+id/border_color"
-                android:saveEnabled="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"
