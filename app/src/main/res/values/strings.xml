@@ -475,4 +475,9 @@ This is an advanced version of the 'Queries Remover' module."</string>
     <string name="mChg_current">Current version: %s</string>
     <string name="mChg_view">View changes</string>
 
+
+    <string name="btn_exportImportCustomisation">Export / Import Customisation</string>
+    <string name="dialog_exportImportTitle">Export / Import Customisation JSON</string>
+    <string name="toast_invalidJson">Invalid JSON format</string>
+    <string name="toast_customisationApplied">Customisation applied successfully</string>
 </resources>
