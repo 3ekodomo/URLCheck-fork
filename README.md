@@ -2,7 +2,7 @@
 
 <!-- ---------- Header ---------- -->
 <img src="./docs/featured.png">
-
+</div>
 <!-- Original background with CC0 from https://www.maxpixel.net/Digital-Network-Internet-Communication-Connections-3537400 -->
 
 <!-- title -->
@@ -40,7 +40,7 @@ make new feature requests in issues tab !
 alt="Get it on GitHub"
 height="80">](https://github.com/3ekodomo/URLCheck-fork/releases/latest/)
 
-</div>
+
 
 # Credits
 - [TrianguloY](https://github.com/TrianguloY/URLCheck)
