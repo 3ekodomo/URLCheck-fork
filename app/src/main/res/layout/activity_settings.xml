@@ -143,6 +143,72 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/smallPadding">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/txt_overall_interface_edges" />
+
+            <Spinner
+                android:id="@+id/overall_edges"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:saveEnabled="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/overall_border_color_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/smallPadding"
+            android:paddingBottom="@dimen/smallPadding">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/txt_overall_border_color" />
+
+            <EditText
+                android:id="@+id/overall_border_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:inputType="text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/overall_border_width_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/txt_overall_border_width" />
+
+            <TextView
+                android:id="@+id/overall_border_width_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/overall_border_width_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:min="1"
+            android:padding="@dimen/smallPadding" />
+
+        <LinearLayout
             android:id="@+id/rounded_amount_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -176,11 +242,11 @@
             android:text="@string/txt_show_element_borders" />
 
         <Switch
-            android:id="@+id/show_interface_border"
+            android:id="@+id/show_overall_interface_border"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/smallPadding"
-            android:text="@string/txt_show_interface_border" />
+            android:text="@string/txt_show_overall_interface_border" />
 
         <LinearLayout
             android:layout_width="match_parent"

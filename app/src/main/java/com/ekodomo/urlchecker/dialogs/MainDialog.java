@@ -230,6 +230,9 @@ public class MainDialog extends Activity {
         // set width
         AndroidUtils.setActivityWidth(WIDTH_PREF(this).get(), this);
 
+        // Apply overall interface edge/border to the dialog window.
+        AndroidUtils.setOverallInterfaceStyle(this);
+
         // load helpers
         automationRules = new AutomationRules(this);
 
@@ -287,12 +290,6 @@ public class MainDialog extends Activity {
         // avoid empty
         if (ll_main.getChildCount() == 0) {
             ll_main.addView(egg()); // ;)
-        }
-
-        // Apply interface border if configured
-        View middleModulesView = findViewById(R.id.middle_modules);
-        if (middleModulesView != null) {
-            AndroidUtils.setInterfaceBorder(middleModulesView, this);
         }
 
         Animations.enableAnimationsRecursively(this);

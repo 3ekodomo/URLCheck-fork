@@ -164,18 +164,59 @@ public class SettingsActivity extends Activity {
         );
 
         AndroidSettings.SHOW_ELEMENT_BORDER_PREF(this).attachToSwitch(findViewById(R.id.show_element_borders));
-        AndroidSettings.SHOW_INTERFACE_BORDER_PREF(this).attachToSwitch(findViewById(R.id.show_interface_border));
+
+        AndroidSettings.OVERALL_EDGES_PREF(this).attachToSpinner(
+                findViewById(R.id.overall_edges),
+                v -> {
+                    updateOverallRoundedVisibility();
+                    AndroidSettings.reload(SettingsActivity.this);
+                }
+        );
+
+        AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(this).attachToSwitch(
+                findViewById(R.id.show_overall_interface_border)
+        );
+
+        AndroidSettings.OVERALL_BORDER_COLOR_PREF(this).attachToEditText(
+                findViewById(R.id.overall_border_color)
+        );
+
+        AndroidSettings.OVERALL_BORDER_WIDTH_PREF(this).attachToSeekBar(
+                findViewById(R.id.overall_border_width_value),
+                findViewById(R.id.overall_border_width_label),
+                prefValue -> Pair.create(prefValue, prefValue + "dp"),
+                seekBarValue -> seekBarValue
+        );
 
         AndroidSettings.ELEMENT_COLOR_PREF(this).attachToEditText(findViewById(R.id.element_color));
         AndroidSettings.BORDER_COLOR_PREF(this).attachToEditText(findViewById(R.id.border_color));
 
         updateRoundedAmountVisibility();
+        updateOverallRoundedVisibility();
+        updateOverallBorderVisibility();
+
+        ((android.widget.Switch) findViewById(R.id.show_overall_interface_border))
+                .setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(this).set(isChecked);
+                    updateOverallBorderVisibility();
+                });
     }
 
     private void updateRoundedAmountVisibility() {
         boolean isRounded = AndroidSettings.EDGES_PREF(this).get() == AndroidSettings.Edges.ROUNDED;
         findViewById(R.id.rounded_amount_container).setVisibility(isRounded ? View.VISIBLE : View.GONE);
         findViewById(R.id.rounded_amount_value).setVisibility(isRounded ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateOverallRoundedVisibility() {
+        // Overall "Rounded" uses a fixed clean dialog radius; element rounded amount remains independent.
+    }
+
+    private void updateOverallBorderVisibility() {
+        boolean enabled = AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(this).get();
+        findViewById(R.id.overall_border_color_container).setVisibility(enabled ? View.VISIBLE : View.GONE);
+        findViewById(R.id.overall_border_width_container).setVisibility(enabled ? View.VISIBLE : View.GONE);
+        findViewById(R.id.overall_border_width_value).setVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
     /* ------------------- locale ------------------- */
@@ -232,6 +273,9 @@ public class SettingsActivity extends Activity {
             JSONObject uiPrefs = new JSONObject();
             uiPrefs.put("edges", AndroidSettings.EDGES_PREF(this).get().name().toLowerCase());
             uiPrefs.put("borders", AndroidSettings.SHOW_ELEMENT_BORDER_PREF(this).get());
+            uiPrefs.put("overall_edges", AndroidSettings.OVERALL_EDGES_PREF(this).get().name().toLowerCase());
+            uiPrefs.put("overall_border", AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(this).get());
+            uiPrefs.put("overall_border_width", AndroidSettings.OVERALL_BORDER_WIDTH_PREF(this).get());
             customisation.put("ui_preferences", uiPrefs);
 
             JSONObject colors = new JSONObject();
@@ -241,6 +285,7 @@ public class SettingsActivity extends Activity {
                 JSONObject themeColors = new JSONObject();
                 String eKey = "element_color_" + themeName;
                 String bKey = "border_color_" + themeName;
+                String obKey = "overall_border_color_" + themeName;
 
                 // Fetch from prefs, or use default if not present (optional, but let's only export saved ones or all defaults)
                 // Let's export what's saved, or the default so it matches schema.
@@ -251,6 +296,10 @@ public class SettingsActivity extends Activity {
                 String bColor = prefs.getString(bKey, null);
                 if (bColor != null) {
                     themeColors.put("border", bColor);
+                }
+                String obColor = prefs.getString(obKey, null);
+                if (obColor != null) {
+                    themeColors.put("overall_border", obColor);
                 }
 
                 if (themeColors.length() > 0) {
@@ -299,6 +348,27 @@ public class SettingsActivity extends Activity {
                                 if (uiPrefsObj.has("borders")) {
                                     editor.putBoolean("showElementBorder", uiPrefsObj.getBoolean("borders"));
                                 }
+                                if (uiPrefsObj.has("overall_edges")) {
+                                    String overallEdgesStr = uiPrefsObj.getString("overall_edges").toUpperCase();
+                                    try {
+                                        AndroidSettings.OverallEdges overallEdges =
+                                                AndroidSettings.OverallEdges.valueOf(overallEdgesStr);
+                                        editor.putInt("overallEdges", overallEdges.getId());
+                                    } catch (IllegalArgumentException e) {
+                                        Toast.makeText(this, "Invalid overall edge style: " + overallEdgesStr, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                if (uiPrefsObj.has("overall_border")) {
+                                    editor.putBoolean("showOverallInterfaceBorder", uiPrefsObj.getBoolean("overall_border"));
+                                }
+                                if (uiPrefsObj.has("overall_border_width")) {
+                                    int width = uiPrefsObj.getInt("overall_border_width");
+                                    if (width >= 1 && width <= 10) {
+                                        editor.putInt("overall_border_width", width);
+                                    } else {
+                                        Toast.makeText(this, "Invalid overall border width: " + width, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
                             }
 
                             if (newCustomisation.has("colors")) {
@@ -311,6 +381,7 @@ public class SettingsActivity extends Activity {
                                         JSONObject themeColors = colorsObj.getJSONObject(themeName);
                                         String eKey = "element_color_" + themeName;
                                         String bKey = "border_color_" + themeName;
+                                        String obKey = "overall_border_color_" + themeName;
                                         if (themeColors.has("element")) {
                                             String val = themeColors.getString("element");
                                             if (colorPattern.matcher(val).matches()) {
@@ -323,6 +394,14 @@ public class SettingsActivity extends Activity {
                                             String val = themeColors.getString("border");
                                             if (colorPattern.matcher(val).matches()) {
                                                 editor.putString(bKey, val);
+                                            } else {
+                                                Toast.makeText(this, "Invalid color: " + val, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                        if (themeColors.has("overall_border")) {
+                                            String val = themeColors.getString("overall_border");
+                                            if (colorPattern.matcher(val).matches()) {
+                                                editor.putString(obKey, val);
                                             } else {
                                                 Toast.makeText(this, "Invalid color: " + val, Toast.LENGTH_SHORT).show();
                                             }

@@ -106,12 +106,55 @@ public interface AndroidSettings {
         return new IntPref("roundedAmount", 20, cntx);
     }
 
+    /** Overall dialog/window edge style. Kept separate from element edges. */
+    enum OverallEdges implements Enums.IdEnum, Enums.StringEnum {
+        DEFAULT(0, R.string.spin_overall_edges_default),
+        SHARP(1, R.string.spin_overall_edges_sharp),
+        ROUNDED(2, R.string.spin_overall_edges_rounded),
+        ;
+
+        private final int id;
+        private final int string;
+
+        OverallEdges(int id, int string) {
+            this.id = id;
+            this.string = string;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public int getStringResource() {
+            return string;
+        }
+    }
+
+    static EnumerationPref<OverallEdges> OVERALL_EDGES_PREF(Context cntx) {
+        return new EnumerationPref<>("overallEdges", OverallEdges.DEFAULT, OverallEdges.class, cntx);
+    }
+
     static BoolPref SHOW_ELEMENT_BORDER_PREF(Context cntx) {
         return new BoolPref("showElementBorder", false, cntx);
     }
 
-    static BoolPref SHOW_INTERFACE_BORDER_PREF(Context cntx) {
-        return new BoolPref("showInterfaceBorder", false, cntx);
+    static BoolPref SHOW_OVERALL_INTERFACE_BORDER_PREF(Context cntx) {
+        return new BoolPref("showOverallInterfaceBorder", false, cntx);
+    }
+
+    static String getDefaultOverallBorderColor(Context cntx) {
+        return getDefaultBorderColor(cntx);
+    }
+
+    static StringPref OVERALL_BORDER_COLOR_PREF(Context cntx) {
+        String themeKey = getResolvedTheme(cntx).name().toLowerCase();
+        return new StringPref("overall_border_color_" + themeKey, getDefaultOverallBorderColor(cntx), cntx);
+    }
+
+    static IntPref OVERALL_BORDER_WIDTH_PREF(Context cntx) {
+        return new IntPref("overall_border_width", 2, cntx);
     }
 
     static Theme getResolvedTheme(Context cntx) {
