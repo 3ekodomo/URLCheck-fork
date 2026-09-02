@@ -114,12 +114,31 @@ public interface AndroidSettings {
         return new BoolPref("showInterfaceBorder", false, cntx);
     }
 
+    static String getDefaultElementColor(Context cntx) {
+        Theme theme = THEME_PREF(cntx).get();
+        if (theme == Theme.AMOLED) return "#000000";
+        if (theme == Theme.DARK) return "#1E1F24";
+        if (theme == Theme.LIGHT) return "#FFFFFF";
+        // DEFAULT theme
+        boolean isDark = (cntx.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        return isDark ? "#1E1F24" : "#FFFFFF";
+    }
+
+    static String getDefaultBorderColor(Context cntx) {
+        Theme theme = THEME_PREF(cntx).get();
+        if (theme == Theme.AMOLED || theme == Theme.DARK) return "#CCCCCC";
+        if (theme == Theme.LIGHT) return "#808080";
+        // DEFAULT theme
+        boolean isDark = (cntx.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        return isDark ? "#CCCCCC" : "#808080";
+    }
+
     static StringPref ELEMENT_COLOR_PREF(Context cntx) {
-        return new StringPref("elementColor", "#ffffff", cntx);
+        return new StringPref("elementColor_" + THEME_PREF(cntx).get().name(), getDefaultElementColor(cntx), cntx);
     }
 
     static StringPref BORDER_COLOR_PREF(Context cntx) {
-        return new StringPref("borderColor", "#808080", cntx);
+        return new StringPref("borderColor_" + THEME_PREF(cntx).get().name(), getDefaultBorderColor(cntx), cntx);
     }
 
     /* ------------------- reloading ------------------- */

@@ -32,7 +32,7 @@ public class SettingsActivity extends Activity {
 
     private final SharedPreferences.OnSharedPreferenceChangeListener themeChangeListener = (sharedPreferences, key) -> {
         if ("dayNight".equals(key)) {
-            recreate();
+            AndroidSettings.reload(SettingsActivity.this);
         }
     };
 
