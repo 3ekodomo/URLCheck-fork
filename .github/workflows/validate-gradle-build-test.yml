@@ -4,9 +4,8 @@
 name: Validate gradle build test
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch: 
+  
   pull_request:
 
 # Cancel running actions if new commits are added
