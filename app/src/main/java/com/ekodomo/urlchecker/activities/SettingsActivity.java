@@ -13,6 +13,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.content.SharedPreferences;
 import android.widget.Spinner;
+import android.app.AlertDialog;
+import android.widget.EditText;
+import android.widget.Toast;
+import org.json.JSONObject;
+import org.json.JSONException;
+import java.util.regex.Pattern;
+import android.content.SharedPreferences;
+import com.ekodomo.urlchecker.utilities.AndroidSettings;
+
 
 import com.ekodomo.urlchecker.R;
 import com.ekodomo.urlchecker.fragments.BrowserButtonsFragment;
@@ -208,6 +217,135 @@ public class SettingsActivity extends Activity {
             }
         });
     }
+    /* ------------------- customisation ------------------- */
+
+    public void openImportExportCustomization(View view) {
+        try {
+            android.content.SharedPreferences prefs = com.ekodomo.urlchecker.utilities.generics.GenericPref.getPrefs(this);
+            JSONObject customisation = new JSONObject();
+            customisation.put("version", 1);
+
+            AndroidSettings.Theme currentTheme = AndroidSettings.THEME_PREF(this).get();
+            String themeStr = currentTheme == AndroidSettings.Theme.DEFAULT ? "system" : currentTheme.name().toLowerCase();
+            customisation.put("theme", themeStr);
+
+            JSONObject uiPrefs = new JSONObject();
+            uiPrefs.put("edges", AndroidSettings.EDGES_PREF(this).get().name().toLowerCase());
+            uiPrefs.put("borders", AndroidSettings.SHOW_ELEMENT_BORDER_PREF(this).get());
+            customisation.put("ui_preferences", uiPrefs);
+
+            JSONObject colors = new JSONObject();
+            for (AndroidSettings.Theme t : AndroidSettings.Theme.values()) {
+                if (t == AndroidSettings.Theme.DEFAULT) continue;
+                String themeName = t.name().toLowerCase();
+                JSONObject themeColors = new JSONObject();
+                String eKey = "element_color_" + themeName;
+                String bKey = "border_color_" + themeName;
+
+                // Fetch from prefs, or use default if not present (optional, but let's only export saved ones or all defaults)
+                // Let's export what's saved, or the default so it matches schema.
+                String eColor = prefs.getString(eKey, null);
+                if (eColor != null) {
+                    themeColors.put("element", eColor);
+                }
+                String bColor = prefs.getString(bKey, null);
+                if (bColor != null) {
+                    themeColors.put("border", bColor);
+                }
+
+                if (themeColors.length() > 0) {
+                    colors.put(themeName, themeColors);
+                }
+            }
+            customisation.put("colors", colors);
+
+            EditText input = new EditText(this);
+            input.setSingleLine(false);
+            input.setText(customisation.toString(2));
+
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.dialog_exportImportTitle)
+                    .setView(input)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        try {
+                            JSONObject newCustomisation = new JSONObject(input.getText().toString());
+                            android.content.SharedPreferences.Editor editor = prefs.edit();
+
+                            if (newCustomisation.has("theme")) {
+                                String tStr = newCustomisation.getString("theme");
+                                if ("system".equalsIgnoreCase(tStr)) {
+                                    editor.putInt("dayNight", AndroidSettings.Theme.DEFAULT.getId());
+                                } else {
+                                    try {
+                                        AndroidSettings.Theme theme = AndroidSettings.Theme.valueOf(tStr.toUpperCase());
+                                        editor.putInt("dayNight", theme.getId());
+                                    } catch (IllegalArgumentException e) {
+                                        Toast.makeText(this, "Invalid theme: " + tStr, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+
+                            if (newCustomisation.has("ui_preferences")) {
+                                JSONObject uiPrefsObj = newCustomisation.getJSONObject("ui_preferences");
+                                if (uiPrefsObj.has("edges")) {
+                                    String edgesStr = uiPrefsObj.getString("edges").toUpperCase();
+                                    try {
+                                        AndroidSettings.Edges edges = AndroidSettings.Edges.valueOf(edgesStr);
+                                        editor.putInt("edges", edges.getId());
+                                    } catch (IllegalArgumentException e) {
+                                        Toast.makeText(this, "Invalid edge style: " + edgesStr, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                if (uiPrefsObj.has("borders")) {
+                                    editor.putBoolean("showElementBorder", uiPrefsObj.getBoolean("borders"));
+                                }
+                            }
+
+                            if (newCustomisation.has("colors")) {
+                                JSONObject colorsObj = newCustomisation.getJSONObject("colors");
+                                Pattern colorPattern = Pattern.compile("^#(?:[0-9a-fA-F]{3}){1,2}$");
+                                for (AndroidSettings.Theme t : AndroidSettings.Theme.values()) {
+                                    if (t == AndroidSettings.Theme.DEFAULT) continue;
+                                    String themeName = t.name().toLowerCase();
+                                    if (colorsObj.has(themeName)) {
+                                        JSONObject themeColors = colorsObj.getJSONObject(themeName);
+                                        String eKey = "element_color_" + themeName;
+                                        String bKey = "border_color_" + themeName;
+                                        if (themeColors.has("element")) {
+                                            String val = themeColors.getString("element");
+                                            if (colorPattern.matcher(val).matches()) {
+                                                editor.putString(eKey, val);
+                                            } else {
+                                                Toast.makeText(this, "Invalid color: " + val, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                        if (themeColors.has("border")) {
+                                            String val = themeColors.getString("border");
+                                            if (colorPattern.matcher(val).matches()) {
+                                                editor.putString(bKey, val);
+                                            } else {
+                                                Toast.makeText(this, "Invalid color: " + val, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            editor.apply();
+                            Toast.makeText(this, R.string.toast_customisationApplied, Toast.LENGTH_SHORT).show();
+                            AndroidSettings.reload(this);
+                        } catch (JSONException e) {
+                            Toast.makeText(this, R.string.toast_invalidJson, Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     /* ------------------- tutorial ------------------- */
 
