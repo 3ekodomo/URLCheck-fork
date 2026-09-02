@@ -76,6 +76,7 @@ public interface AndroidSettings {
     enum Edges implements Enums.IdEnum, Enums.StringEnum {
         ROUNDED(0, R.string.spin_edges_rounded),
         SHARP(1, R.string.spin_edges_sharp),
+        DEFAULT(2, R.string.spin_edges_default),
         ;
 
         private final int id;
@@ -98,15 +99,19 @@ public interface AndroidSettings {
     }
 
     static EnumerationPref<Edges> EDGES_PREF(Context cntx) {
-        return new EnumerationPref<>("edges", Edges.ROUNDED, Edges.class, cntx);
+        return new EnumerationPref<>("edges", Edges.DEFAULT, Edges.class, cntx);
     }
 
     static IntPref ROUNDED_AMOUNT_PREF(Context cntx) {
         return new IntPref("roundedAmount", 20, cntx);
     }
 
-    static BoolPref SHOW_BORDER_PREF(Context cntx) {
-        return new BoolPref("showBorder", true, cntx);
+    static BoolPref SHOW_ELEMENT_BORDER_PREF(Context cntx) {
+        return new BoolPref("showElementBorder", false, cntx);
+    }
+
+    static BoolPref SHOW_INTERFACE_BORDER_PREF(Context cntx) {
+        return new BoolPref("showInterfaceBorder", false, cntx);
     }
 
     static StringPref ELEMENT_COLOR_PREF(Context cntx) {

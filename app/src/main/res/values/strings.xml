@@ -63,8 +63,10 @@ Translations: %3$s."</string>
     <string name="txt_interface_edges">Interface edges:</string>
     <string name="spin_edges_rounded">Rounded</string>
     <string name="spin_edges_sharp">Sharp</string>
+    <string name="spin_edges_default">Default</string>
     <string name="txt_rounded_amount">Rounded amount:</string>
-    <string name="txt_show_border">Show border</string>
+    <string name="txt_show_element_borders">Show element borders</string>
+    <string name="txt_show_interface_border">Show interface border</string>
     <string name="txt_element_color">Element color (hex):</string>
     <string name="txt_border_color">Border color (hex):</string>
     <string name="txt_animation">Enable animations</string>

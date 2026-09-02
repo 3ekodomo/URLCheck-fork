@@ -169,11 +169,18 @@
             android:padding="@dimen/smallPadding" />
 
         <Switch
-            android:id="@+id/show_border"
+            android:id="@+id/show_element_borders"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/smallPadding"
-            android:text="@string/txt_show_border" />
+            android:text="@string/txt_show_element_borders" />
+
+        <Switch
+            android:id="@+id/show_interface_border"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/smallPadding"
+            android:text="@string/txt_show_interface_border" />
 
         <LinearLayout
             android:layout_width="match_parent"

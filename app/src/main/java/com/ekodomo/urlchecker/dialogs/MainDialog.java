@@ -289,6 +289,12 @@ public class MainDialog extends Activity {
             ll_main.addView(egg()); // ;)
         }
 
+        // Apply interface border if configured
+        View middleModulesView = findViewById(R.id.middle_modules);
+        if (middleModulesView != null) {
+            AndroidUtils.setInterfaceBorder(middleModulesView, this);
+        }
+
         Animations.enableAnimationsRecursively(this);
     }
 
