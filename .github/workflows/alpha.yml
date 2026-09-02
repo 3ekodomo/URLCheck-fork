@@ -4,26 +4,21 @@
 name: Build alpha apk
 
 on:
-  # Triggers the workflow on push events for the master branch
-  # push:
-  #   branches:
-  #     - master
-
   # Run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# parameters
 env:
   VARIANT: alpha
   TAG: alpha
   ZIP: app-alpha.zip
 
 permissions:
-  contents: write # need to update tag and release
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Get the repository files
         uses: actions/checkout@v7
@@ -37,20 +32,26 @@ jobs:
       - name: Setup gradle
         uses: gradle/actions/setup-gradle@v6
 
+      # Fix "Permission denied" for gradlew
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
       - name: Build & assemble
         run: ./gradlew build assemble${{ env.VARIANT }}
 
       - name: Zip ${{ env.VARIANT }} apk as ${{ env.ZIP }}
-        # just remove the password here if you want to build the apk yourself instead of sponsoring me and getting it as a benefit :(
-        run: zip -j -P ${{ secrets.ALPHA_PASS }} ${{ env.ZIP }} app/build/outputs/apk/${{ env.VARIANT }}/*.apk
+        run: |
+          zip -j -P "${{ secrets.ALPHA_PASS }}" \
+            "${{ env.ZIP }}" \
+            app/build/outputs/apk/${{ env.VARIANT }}/*.apk
 
       - name: Update ${{ env.TAG }} tag to current commit
         run: |
-          git tag --force ${{ env.TAG }}
-          git push --force origin tag ${{ env.TAG }}
+          git tag --force "${{ env.TAG }}"
+          git push --force origin "tag" "${{ env.TAG }}"
 
       - name: Upload ${{ env.ZIP }} to ${{ env.TAG }} release
         run: |
-          gh release upload ${{ env.TAG }} ${{ env.ZIP }} --clobber
+          gh release upload "${{ env.TAG }}" "${{ env.ZIP }}" --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
