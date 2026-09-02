@@ -71,7 +71,8 @@ dependencies {
 
 // configure signing for release
 private String secret(String name) {
-    project.hasProperty(name) ? project.property(name) : System.getenv(name)
+    def val = project.hasProperty(name) ? project.property(name) : System.getenv(name)
+    return val ? val.trim() : null
 }
 
 if (secret('RELEASE_STORE_FILE')) {
