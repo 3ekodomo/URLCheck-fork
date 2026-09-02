@@ -31,6 +31,9 @@ jobs:
       - name: Setup gradle
         uses: gradle/actions/setup-gradle@v6
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Create release store file
         run: |
           RELEASE_STORE_FILE=$(readlink -f release_store_file)
