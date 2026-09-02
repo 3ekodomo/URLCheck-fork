@@ -41,3 +41,6 @@ alt="Get it on GitHub"
 height="80">](https://github.com/3ekodomo/URLCheck-fork/releases/latest/)
 
 </div>
+
+# Credits
+- [TrianguloY](https://github.com/TrianguloY/URLCheck)
