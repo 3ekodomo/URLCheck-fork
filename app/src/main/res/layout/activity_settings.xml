@@ -161,6 +161,32 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/overall_rounded_amount_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/txt_overall_rounded_amount" />
+
+            <TextView
+                android:id="@+id/overall_rounded_amount_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/overall_rounded_amount_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="64"
+            android:min="0"
+            android:padding="@dimen/smallPadding" />
+
+        <LinearLayout
             android:id="@+id/overall_border_color_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -76,116 +76,14 @@ public interface AndroidUtils {
         view.setBackground(drawable);
     }
 
-    /**
-     * Applies custom background style to a view based on user preferences.
-     * Replaces uses of predefined drawables like round_border and round_box
-     * with a dynamically generated GradientDrawable.
-     */
+    /** Applies the current theme-aware element customization. */
     static void setCustomBackground(View view, Context context) {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.RECTANGLE);
-
-        // Element Color
-        try {
-            String colorStr = AndroidSettings.ELEMENT_COLOR_PREF(context).get();
-            int color = Color.parseColor(colorStr);
-            drawable.setColor(color);
-        } catch (IllegalArgumentException e) {
-            drawable.setColor(Color.WHITE); // Default if parse fails
-        }
-
-        // Edges Configuration
-        AndroidSettings.Edges edgePref = AndroidSettings.EDGES_PREF(context).get();
-        if (edgePref == AndroidSettings.Edges.ROUNDED) {
-            float amount = (float) AndroidSettings.ROUNDED_AMOUNT_PREF(context).get();
-            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, amount, context.getResources().getDisplayMetrics());
-            drawable.setCornerRadius(radius);
-        } else if (edgePref == AndroidSettings.Edges.SHARP) {
-            drawable.setCornerRadius(0f);
-        } else {
-            // DEFAULT
-            float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20f, context.getResources().getDisplayMetrics());
-            drawable.setCornerRadius(radius);
-        }
-
-        // Border Configuration
-        if (AndroidSettings.SHOW_ELEMENT_BORDER_PREF(context).get()) {
-            try {
-                String colorStr = AndroidSettings.BORDER_COLOR_PREF(context).get();
-                int color = Color.parseColor(colorStr);
-                // ~1.5dp stroke width as default, 4px was used before in round_border
-                int strokeWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, context.getResources().getDisplayMetrics());
-                drawable.setStroke(strokeWidth, color);
-            } catch (IllegalArgumentException e) {
-                // Ignore stroke color issue
-            }
-        }
-
-        view.setBackground(drawable);
+        com.ekodomo.urlchecker.utilities.DialogCustomization.applyElement(view, context);
     }
 
-    /**
-     * Applies the overall interface edge and border to the dialog window.
-     * DEFAULT leaves the platform dialog untouched unless a custom border is enabled.
-     */
+    /** Applies the current theme-aware overall dialog customization. */
     static void setOverallInterfaceStyle(Activity activity) {
-        var window = activity.getWindow();
-        var decorView = window.getDecorView();
-
-        AndroidSettings.OverallEdges edgePref = AndroidSettings.OVERALL_EDGES_PREF(activity).get();
-        boolean showBorder = AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(activity).get();
-
-        // Preserve the native DeviceDefault dialog appearance when nothing custom is requested.
-        if (edgePref == AndroidSettings.OverallEdges.DEFAULT && !showBorder) {
-            return;
-        }
-
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.RECTANGLE);
-
-        // Overall interface background follows the current element/theme color.
-        try {
-            drawable.setColor(Color.parseColor(AndroidSettings.ELEMENT_COLOR_PREF(activity).get()));
-        } catch (IllegalArgumentException e) {
-            drawable.setColor(Color.TRANSPARENT);
-        }
-
-        // Overall interface edges.
-        if (edgePref == AndroidSettings.OverallEdges.SHARP) {
-            drawable.setCornerRadius(0f);
-        } else if (edgePref == AndroidSettings.OverallEdges.ROUNDED) {
-            float radius = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, 20f,
-                    activity.getResources().getDisplayMetrics());
-            drawable.setCornerRadius(radius);
-        } else {
-            // DEFAULT + custom border: approximate the platform DeviceDefault dialog corner.
-            float radius = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, 28f,
-                    activity.getResources().getDisplayMetrics());
-            drawable.setCornerRadius(radius);
-        }
-
-        if (showBorder) {
-            try {
-                String colorStr = AndroidSettings.OVERALL_BORDER_COLOR_PREF(activity).get();
-                int color = Color.parseColor(colorStr);
-                int widthDp = Math.max(1, AndroidSettings.OVERALL_BORDER_WIDTH_PREF(activity).get());
-                int strokeWidth = (int) TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP, widthDp,
-                        activity.getResources().getDisplayMetrics());
-                drawable.setStroke(strokeWidth, color);
-            } catch (IllegalArgumentException e) {
-                // Keep the background even if the custom color is invalid.
-            }
-        }
-
-        window.setBackgroundDrawable(drawable);
-
-        // Clip content to the rounded outer shape on supported Android versions.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            decorView.setClipToOutline(true);
-        }
+        com.ekodomo.urlchecker.utilities.DialogCustomization.applyOverall(activity);
     }
 
     /** Clears the background color of a view */

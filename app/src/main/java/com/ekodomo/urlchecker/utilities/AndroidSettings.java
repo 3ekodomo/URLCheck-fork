@@ -157,6 +157,11 @@ public interface AndroidSettings {
         return new IntPref("overall_border_width", 2, cntx);
     }
 
+    /** Corner radius used only when the overall interface edge is ROUNDED. */
+    static IntPref OVERALL_ROUNDED_AMOUNT_PREF(Context cntx) {
+        return new IntPref("overall_rounded_amount", 28, cntx);
+    }
+
     static Theme getResolvedTheme(Context cntx) {
         Theme theme = THEME_PREF(cntx).get();
         if (theme == Theme.DEFAULT) {
@@ -180,11 +185,16 @@ public interface AndroidSettings {
         return "#CCCCCC";
     }
 
+    /**
+     * Element color is an override for the current effective theme. If there is
+     * no override, get() returns the current theme's native default.
+     */
     static StringPref ELEMENT_COLOR_PREF(Context cntx) {
         String themeKey = getResolvedTheme(cntx).name().toLowerCase();
         return new StringPref("element_color_" + themeKey, getDefaultElementColor(cntx), cntx);
     }
 
+    /** Border color is also an override scoped to the current effective theme. */
     static StringPref BORDER_COLOR_PREF(Context cntx) {
         String themeKey = getResolvedTheme(cntx).name().toLowerCase();
         return new StringPref("border_color_" + themeKey, getDefaultBorderColor(cntx), cntx);

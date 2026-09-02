@@ -73,6 +73,7 @@ Translations: %3$s."</string>
     <string name="spin_overall_edges_rounded">Round</string>
     <string name="txt_overall_border_color">Overall border colour (hex):</string>
     <string name="txt_overall_border_width">Overall border width:</string>
+    <string name="txt_overall_rounded_amount">Overall rounded amount:</string>
     <string name="txt_element_color">Element color (hex):</string>
     <string name="txt_border_color">Border color (hex):</string>
     <string name="txt_animation">Enable animations</string>

@@ -19,14 +19,12 @@ import android.widget.Toast;
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.util.regex.Pattern;
-import android.content.SharedPreferences;
 import com.ekodomo.urlchecker.utilities.AndroidSettings;
 
 
 import com.ekodomo.urlchecker.R;
 import com.ekodomo.urlchecker.fragments.BrowserButtonsFragment;
 import com.ekodomo.urlchecker.fragments.ResultCodeInjector;
-import com.ekodomo.urlchecker.utilities.AndroidSettings;
 import com.ekodomo.urlchecker.utilities.generics.GenericPref.BoolPref;
 import com.ekodomo.urlchecker.utilities.generics.GenericPref.IntPref;
 import com.ekodomo.urlchecker.utilities.methods.AndroidUtils;
@@ -38,12 +36,6 @@ import java.util.Objects;
 
 /** An activity with general app-related settings */
 public class SettingsActivity extends Activity {
-
-    private final SharedPreferences.OnSharedPreferenceChangeListener themeChangeListener = (sharedPreferences, key) -> {
-        if ("dayNight".equals(key)) {
-            AndroidSettings.reload(SettingsActivity.this);
-        }
-    };
 
     /** The width pref */
     public static IntPref WIDTH_PREF(Context cntx) {
@@ -82,18 +74,6 @@ public class SettingsActivity extends Activity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        com.ekodomo.urlchecker.utilities.generics.GenericPref.getPrefs(this).registerOnSharedPreferenceChangeListener(themeChangeListener);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        com.ekodomo.urlchecker.utilities.generics.GenericPref.getPrefs(this).unregisterOnSharedPreferenceChangeListener(themeChangeListener);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             // press the 'back' button in the action bar to go back
@@ -125,7 +105,7 @@ public class SettingsActivity extends Activity {
         // init dayNight spinner
         AndroidSettings.THEME_PREF(this).attachToSpinner(
                 this.findViewById(R.id.theme),
-                null
+                value -> AndroidSettings.reload(SettingsActivity.this)
         );
 
         // init width seekBar
@@ -173,6 +153,13 @@ public class SettingsActivity extends Activity {
                 }
         );
 
+        AndroidSettings.OVERALL_ROUNDED_AMOUNT_PREF(this).attachToSeekBar(
+                findViewById(R.id.overall_rounded_amount_value),
+                findViewById(R.id.overall_rounded_amount_label),
+                prefValue -> Pair.create(prefValue, prefValue + "dp"),
+                seekBarValue -> seekBarValue
+        );
+
         AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(this).attachToSwitch(
                 findViewById(R.id.show_overall_interface_border)
         );
@@ -195,11 +182,6 @@ public class SettingsActivity extends Activity {
         updateOverallRoundedVisibility();
         updateOverallBorderVisibility();
 
-        ((android.widget.Switch) findViewById(R.id.show_overall_interface_border))
-                .setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(this).set(isChecked);
-                    updateOverallBorderVisibility();
-                });
     }
 
     private void updateRoundedAmountVisibility() {
@@ -209,7 +191,9 @@ public class SettingsActivity extends Activity {
     }
 
     private void updateOverallRoundedVisibility() {
-        // Overall "Rounded" uses a fixed clean dialog radius; element rounded amount remains independent.
+        boolean rounded = AndroidSettings.OVERALL_EDGES_PREF(this) .get() == AndroidSettings.OverallEdges.ROUNDED;
+        findViewById(R.id.overall_rounded_amount_container).setVisibility(rounded ? View.VISIBLE : View.GONE);
+        findViewById(R.id.overall_rounded_amount_value).setVisibility(rounded ? View.VISIBLE : View.GONE);
     }
 
     private void updateOverallBorderVisibility() {
@@ -276,6 +260,7 @@ public class SettingsActivity extends Activity {
             uiPrefs.put("overall_edges", AndroidSettings.OVERALL_EDGES_PREF(this).get().name().toLowerCase());
             uiPrefs.put("overall_border", AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(this).get());
             uiPrefs.put("overall_border_width", AndroidSettings.OVERALL_BORDER_WIDTH_PREF(this).get());
+            uiPrefs.put("overall_rounded_amount", AndroidSettings.OVERALL_ROUNDED_AMOUNT_PREF(this).get());
             customisation.put("ui_preferences", uiPrefs);
 
             JSONObject colors = new JSONObject();
@@ -367,6 +352,14 @@ public class SettingsActivity extends Activity {
                                         editor.putInt("overall_border_width", width);
                                     } else {
                                         Toast.makeText(this, "Invalid overall border width: " + width, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                if (uiPrefsObj.has("overall_rounded_amount")) {
+                                    int radius = uiPrefsObj.getInt("overall_rounded_amount");
+                                    if (radius >= 0 && radius <= 64) {
+                                        editor.putInt("overall_rounded_amount", radius);
+                                    } else {
+                                        Toast.makeText(this, "Invalid overall rounded amount: " + radius, Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             }
