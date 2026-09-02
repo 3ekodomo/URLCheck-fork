@@ -144,6 +144,11 @@ public class SettingsActivity extends Activity {
         );
 
         AndroidSettings.SHOW_ELEMENT_BORDER_PREF(this).attachToSwitch(findViewById(R.id.show_element_borders));
+        ((android.widget.Switch) findViewById(R.id.show_element_borders))
+                .setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    AndroidSettings.SHOW_ELEMENT_BORDER_PREF(this).set(isChecked);
+                    updateElementBorderVisibility();
+                });
 
         AndroidSettings.OVERALL_EDGES_PREF(this).attachToSpinner(
                 findViewById(R.id.overall_edges),
@@ -163,6 +168,11 @@ public class SettingsActivity extends Activity {
         AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(this).attachToSwitch(
                 findViewById(R.id.show_overall_interface_border)
         );
+        ((android.widget.Switch) findViewById(R.id.show_overall_interface_border))
+                .setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(this).set(isChecked);
+                    updateOverallBorderVisibility();
+                });
 
         AndroidSettings.OVERALL_BORDER_COLOR_PREF(this).attachToEditText(
                 findViewById(R.id.overall_border_color)
@@ -181,7 +191,13 @@ public class SettingsActivity extends Activity {
         updateRoundedAmountVisibility();
         updateOverallRoundedVisibility();
         updateOverallBorderVisibility();
+        updateElementBorderVisibility();
 
+    }
+
+    private void updateElementBorderVisibility() {
+        boolean enabled = AndroidSettings.SHOW_ELEMENT_BORDER_PREF(this).get();
+        findViewById(R.id.border_color_container).setVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
     private void updateRoundedAmountVisibility() {

@@ -78,44 +78,74 @@ public final class DialogCustomization {
      */
     public static void applyOverall(Activity activity) {
         View surface = activity.findViewById(com.ekodomo.urlchecker.R.id.overall_interface_surface);
+        View borderOverlay = activity.findViewById(com.ekodomo.urlchecker.R.id.overall_interface_border_overlay);
         if (surface == null) return;
 
         AndroidSettings.OverallEdges edge = AndroidSettings.OVERALL_EDGES_PREF(activity).get();
         boolean borderEnabled = AndroidSettings.SHOW_OVERALL_INTERFACE_BORDER_PREF(activity).get();
 
-        // Default means "do not replace the platform dialog surface". This keeps
-        // the original Android dialog appearance unless the user explicitly
-        // chooses an overall edge or border.
-        if (edge == AndroidSettings.OverallEdges.DEFAULT && !borderEnabled) {
+        boolean customSurface = edge != AndroidSettings.OverallEdges.DEFAULT || borderEnabled;
+        if (!customSurface) {
             activity.getWindow().setBackgroundDrawable(null);
             surface.setBackground(null);
-            surface.setPadding(0, 0, 0, 0);
+            if (borderOverlay != null) {
+                borderOverlay.setBackground(null);
+                borderOverlay.setVisibility(View.GONE);
+            }
             return;
         }
 
-        // The custom surface owns the complete border. The window itself is
-        // transparent so Android's dialog background cannot add an inset border
-        // on only two sides or clip the top/bottom strokes.
-        activity.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+        // The window and content surface are transparent. The content can then
+        // use the full area without covering the custom border.
+        activity.getWindow().setBackgroundDrawable(
+                new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT)
+        );
 
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.RECTANGLE);
-        drawable.setColor(resolveThemeBackground(activity));
+        GradientDrawable surfaceDrawable = new GradientDrawable();
+        surfaceDrawable.setShape(GradientDrawable.RECTANGLE);
+        surfaceDrawable.setColor(resolveThemeBackground(activity));
 
         if (edge == AndroidSettings.OverallEdges.SHARP) {
-            drawable.setCornerRadius(0f);
+            surfaceDrawable.setCornerRadius(0f);
         } else {
             int radius = AndroidSettings.OVERALL_ROUNDED_AMOUNT_PREF(activity).get();
             radius = Math.max(0, Math.min(MAX_OVERALL_RADIUS_DP, radius));
-            drawable.setCornerRadius(dp(activity, radius));
+            surfaceDrawable.setCornerRadius(dp(activity, radius));
         }
 
-        if (borderEnabled) {
-            int width = Math.max(1, Math.min(10, AndroidSettings.OVERALL_BORDER_WIDTH_PREF(activity).get()));
-            drawable.setStroke(dpInt(activity, width), getOverallBorderColor(activity));
-        }
+        surface.setBackground(surfaceDrawable);
 
-        surface.setBackground(drawable);
+        // IMPORTANT: the border is drawn in a separate top layer. The ScrollView
+        // and module views fill the parent, so drawing the stroke on the parent
+        // background caused the top/bottom sides to be painted over.
+        if (borderOverlay != null) {
+            if (borderEnabled) {
+                GradientDrawable borderDrawable = new GradientDrawable();
+                borderDrawable.setShape(GradientDrawable.RECTANGLE);
+                borderDrawable.setColor(Color.TRANSPARENT);
+
+                if (edge == AndroidSettings.OverallEdges.SHARP) {
+                    borderDrawable.setCornerRadius(0f);
+                } else {
+                    int radius = AndroidSettings.OVERALL_ROUNDED_AMOUNT_PREF(activity).get();
+                    radius = Math.max(0, Math.min(MAX_OVERALL_RADIUS_DP, radius));
+                    borderDrawable.setCornerRadius(dp(activity, radius));
+                }
+
+                int width = Math.max(1, Math.min(10,
+                        AndroidSettings.OVERALL_BORDER_WIDTH_PREF(activity).get()));
+                borderDrawable.setStroke(dpInt(activity, width),
+                        getOverallBorderColor(activity));
+
+                borderOverlay.setBackground(borderDrawable);
+                borderOverlay.setVisibility(View.VISIBLE);
+                borderOverlay.setClickable(false);
+                borderOverlay.setFocusable(false);
+            } else {
+                borderOverlay.setBackground(null);
+                borderOverlay.setVisibility(View.GONE);
+            }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             surface.setClipToOutline(edge != AndroidSettings.OverallEdges.SHARP);

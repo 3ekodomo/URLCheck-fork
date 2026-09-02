@@ -148,9 +148,21 @@ public interface AndroidSettings {
         return getDefaultBorderColor(cntx);
     }
 
+    /**
+     * Returns the storage key for a colour override belonging to the currently
+     * effective theme. DEFAULT is resolved to LIGHT/DARK first, so each actual
+     * appearance keeps its own colour instead of sharing one value.
+     */
+    static String themeColorKey(Context cntx, String baseName) {
+        return baseName + "_" + getResolvedTheme(cntx).name().toLowerCase();
+    }
+
     static StringPref OVERALL_BORDER_COLOR_PREF(Context cntx) {
-        String themeKey = getResolvedTheme(cntx).name().toLowerCase();
-        return new StringPref("overall_border_color_" + themeKey, getDefaultOverallBorderColor(cntx), cntx);
+        return new StringPref(
+                themeColorKey(cntx, "overall_border_color"),
+                getDefaultOverallBorderColor(cntx),
+                cntx
+        );
     }
 
     static IntPref OVERALL_BORDER_WIDTH_PREF(Context cntx) {
@@ -190,14 +202,20 @@ public interface AndroidSettings {
      * no override, get() returns the current theme's native default.
      */
     static StringPref ELEMENT_COLOR_PREF(Context cntx) {
-        String themeKey = getResolvedTheme(cntx).name().toLowerCase();
-        return new StringPref("element_color_" + themeKey, getDefaultElementColor(cntx), cntx);
+        return new StringPref(
+                themeColorKey(cntx, "element_color"),
+                getDefaultElementColor(cntx),
+                cntx
+        );
     }
 
     /** Border color is also an override scoped to the current effective theme. */
     static StringPref BORDER_COLOR_PREF(Context cntx) {
-        String themeKey = getResolvedTheme(cntx).name().toLowerCase();
-        return new StringPref("border_color_" + themeKey, getDefaultBorderColor(cntx), cntx);
+        return new StringPref(
+                themeColorKey(cntx, "border_color"),
+                getDefaultBorderColor(cntx),
+                cntx
+        );
     }
 
     /* ------------------- reloading ------------------- */

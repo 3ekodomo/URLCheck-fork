@@ -45,4 +45,14 @@
 
 
     </ScrollView>
+
+    <!-- Draw the overall border above the content so all four sides remain visible. -->
+    <View
+        android:id="@+id/overall_interface_border_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone" />
 </FrameLayout>
