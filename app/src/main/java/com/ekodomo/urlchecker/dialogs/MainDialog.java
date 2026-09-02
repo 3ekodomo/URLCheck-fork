@@ -186,6 +186,8 @@ public class MainDialog extends Activity {
 
         // end, reset
         updating = 0;
+        // The overall border belongs to the content container; refresh after all modules are added.
+        AndroidUtils.setOverallInterfaceStyle(this);
     }
 
     /** Returns the current url data. Please don't modify it */

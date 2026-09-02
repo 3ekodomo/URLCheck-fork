@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/overall_interface_surface"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context="com.ekodomo.urlchecker.dialogs.MainDialog">
 
     <ScrollView
+        android:id="@+id/overall_interface_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
@@ -46,13 +47,5 @@
 
     </ScrollView>
 
-    <!-- Draw the overall border above the content so all four sides remain visible. -->
-    <View
-        android:id="@+id/overall_interface_border_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:clickable="false"
-        android:focusable="false"
-        android:visibility="gone" />
+
 </FrameLayout>
