@@ -52,6 +52,7 @@ public class SettingsActivity extends Activity {
         configureBrowserButtons();
         configureTheme();
         configureLocale();
+        configureEdgesAndColors();
         Animations.ANIMATIONS(this).attachToSwitch(findViewById(R.id.animations));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -114,6 +115,38 @@ public class SettingsActivity extends Activity {
                                 : seekBarValue
         );
 
+    }
+
+    /* ------------------- edges and colors ------------------- */
+
+    private void configureEdgesAndColors() {
+        AndroidSettings.EDGES_PREF(this).attachToSpinner(
+                this.findViewById(R.id.edges),
+                v -> {
+                    updateRoundedAmountVisibility();
+                    AndroidSettings.reload(SettingsActivity.this);
+                }
+        );
+
+        AndroidSettings.ROUNDED_AMOUNT_PREF(this).attachToSeekBar(
+                findViewById(R.id.rounded_amount_value),
+                findViewById(R.id.rounded_amount_label),
+                prefValue -> Pair.create(prefValue, prefValue + "dp"),
+                seekBarValue -> seekBarValue
+        );
+
+        AndroidSettings.SHOW_BORDER_PREF(this).attachToSwitch(findViewById(R.id.show_border));
+
+        AndroidSettings.ELEMENT_COLOR_PREF(this).attachToEditText(findViewById(R.id.element_color));
+        AndroidSettings.BORDER_COLOR_PREF(this).attachToEditText(findViewById(R.id.border_color));
+
+        updateRoundedAmountVisibility();
+    }
+
+    private void updateRoundedAmountVisibility() {
+        boolean isRounded = AndroidSettings.EDGES_PREF(this).get() == AndroidSettings.Edges.ROUNDED;
+        findViewById(R.id.rounded_amount_container).setVisibility(isRounded ? View.VISIBLE : View.GONE);
+        findViewById(R.id.rounded_amount_value).setVisibility(isRounded ? View.VISIBLE : View.GONE);
     }
 
     /* ------------------- locale ------------------- */

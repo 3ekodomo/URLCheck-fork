@@ -8,7 +8,10 @@ import android.util.Log;
 
 import com.ekodomo.urlchecker.R;
 import com.ekodomo.urlchecker.fragments.ResultCodeInjector;
+import com.ekodomo.urlchecker.utilities.generics.GenericPref.BoolPref;
 import com.ekodomo.urlchecker.utilities.generics.GenericPref.EnumerationPref;
+import com.ekodomo.urlchecker.utilities.generics.GenericPref.IntPref;
+import com.ekodomo.urlchecker.utilities.generics.GenericPref.StringPref;
 
 public interface AndroidSettings {
 
@@ -66,6 +69,52 @@ public interface AndroidSettings {
             case LIGHT -> dialog ? R.style.DialogThemeLight : R.style.ActivityThemeLight;
             case AMOLED -> dialog ? R.style.DialogThemeAmoled : R.style.ActivityThemeAmoled;
         });
+    }
+
+    /* ------------------- ui edges ------------------- */
+
+    enum Edges implements Enums.IdEnum, Enums.StringEnum {
+        ROUNDED(0, R.string.spin_edges_rounded),
+        SHARP(1, R.string.spin_edges_sharp),
+        ;
+
+        private final int id;
+        private final int string;
+
+        Edges(int id, int string) {
+            this.id = id;
+            this.string = string;
+        }
+
+        @Override
+        public int getId() {
+            return id;
+        }
+
+        @Override
+        public int getStringResource() {
+            return string;
+        }
+    }
+
+    static EnumerationPref<Edges> EDGES_PREF(Context cntx) {
+        return new EnumerationPref<>("edges", Edges.ROUNDED, Edges.class, cntx);
+    }
+
+    static IntPref ROUNDED_AMOUNT_PREF(Context cntx) {
+        return new IntPref("roundedAmount", 20, cntx);
+    }
+
+    static BoolPref SHOW_BORDER_PREF(Context cntx) {
+        return new BoolPref("showBorder", true, cntx);
+    }
+
+    static StringPref ELEMENT_COLOR_PREF(Context cntx) {
+        return new StringPref("elementColor", "#ffffff", cntx);
+    }
+
+    static StringPref BORDER_COLOR_PREF(Context cntx) {
+        return new StringPref("borderColor", "#808080", cntx);
     }
 
     /* ------------------- reloading ------------------- */

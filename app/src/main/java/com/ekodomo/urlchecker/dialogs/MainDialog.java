@@ -318,6 +318,7 @@ public class MainDialog extends Activity {
                 if (ModuleManager.getDecorationsPrefOfModule(moduleData, this).get()) {
                     // init decorations
                     var block = Inflater.inflate(R.layout.dialog_module, ll);
+                    AndroidUtils.setCustomBackground(block, this);
                     var title = block.<TextView>findViewById(R.id.title);
                     title.setText(getString(R.string.dd, getString(moduleData.getName())));
                     parent = block.findViewById(R.id.mod);
@@ -328,6 +329,9 @@ public class MainDialog extends Activity {
 
                 // set module content
                 child = Inflater.inflate(layoutId, parent);
+                if (parent == ll) {
+                    AndroidUtils.setCustomBackground(child, this);
+                }
                 views.add(child);
             }
 
